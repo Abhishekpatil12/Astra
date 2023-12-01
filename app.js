@@ -6,8 +6,16 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("views"));
 
+const { db, ref, get } = require('./db/db');
+
+app.get('/data', async function (req, res) {
+    const rootRef = ref(db, '/Astra');
+    const data = await get(rootRef);
+    res.send(data);
+});
+
 app.get('/', function(req, res){
-    app.render('index.html');
+    res.render('index.html');
 })
 
 app.listen(3000, function(){
