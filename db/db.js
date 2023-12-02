@@ -1,5 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const { getDatabase, ref, get } = require("firebase/database");
+const { getDatabase } = require("firebase/database");
 
 const firebaseConfig = {
   apiKey: "AIzaSyAaJFGXGnH3MMNXFpwQGj3dmU7KnHo5R_k",
@@ -16,8 +16,4 @@ const firebaseConfig = {
 const app1 = initializeApp(firebaseConfig);
 const db = getDatabase(app1);
 
-module.exports = {
-    db,
-    ref,
-    get
-};
+module.exports = db;

@@ -6,7 +6,8 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("views"));
 
-const { db, ref, get } = require('./db/db');
+const { ref, get } = require("firebase/database");
+const db = require('./db/db');
 
 app.get('/data', async function (req, res) {
     const rootRef = ref(db, '/Astra');
