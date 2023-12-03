@@ -1,5 +1,4 @@
 const express = require('express');
-const ejs = require('ejs');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -11,32 +10,39 @@ app.use(express.static("views"));
 const { ref, set, get } = require("firebase/database");
 const db = require('./db/db');
 
-app.get('/data', async function (req, res) {
+app.get('/', async function (req, res) {
     const rootRef = ref(db, '/astras');
     const astrasData = await get(rootRef);
     const astrasArray = Object.values(astrasData.val());
-    res.render('show', { astras: astrasArray });
+    res.render('home', { astras: astrasArray });
 });
 
-app.get('/data/:astraname', async function(req, res){
-    const keyToRetrieve = req.params.astraname.toLowerCase();
-    const astraRef = ref(db, `/astras/${keyToRetrieve}`);
-    const astraData = await get(astraRef);
-    const astra = astraData.val();
-    res.render('astra', {astra});
+app.get('/:astraid', async function(req, res){
+    try {
+        const keyToRetrieve = req.params.astraid.toLowerCase();
+        const astraRef = ref(db, `/astras/${keyToRetrieve}`);
+        const astraData = await get(astraRef);
+
+        if (astraData.exists()) {
+            const astra = astraData.val();
+            res.render('astra', {astra});
+        } else {
+            console.log(`No data found for key: ${keyToRetrieve}`);
+            res.status(404).send('Not Found');
+        }
+    } catch (error) {
+        console.error('Error retrieving data:', error.message);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
-app.get('/', function(req, res){
-    res.render('index');
-});
-
-app.get('/insert', function(req, res){
+app.get('/admin/insert', function(req, res){
     res.render('insert');
 })
 
-app.post('/insert', function(req, res){
+app.post('/admin/insert', function(req, res){
     const { name, counter_by, deity, used_for} = req.body;
-    const id = name.replace(" ","_");
+    const id = (name.replace(" ","_")).toLowerCase();    
     set( ref(db, `/astras/${id}`) ,{ 
         name, id, counter_by, deity, used_for
     }).then(() => {
